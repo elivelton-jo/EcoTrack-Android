@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="verde_primario">#1B4332</color>   <color name="verde_medio">#2D6A4F</color>      <color name="verde_claro">#52B788</color>      <color name="fundo_tela">#F8F9FA</color>       <color name="branco">#FFFFFF</color>
+    <color name="cinza_texto">#6C757D</color>      <color name="preto_texto">#212529</color>      <color name="erro">#E63946</color>             </resources>

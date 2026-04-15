@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">EcoTrack</string>
+
+    <string-array name="tipos_recurso">
+        <item>agua</item>
+        <item>energia</item>
+    </string-array>
+
+</resources>

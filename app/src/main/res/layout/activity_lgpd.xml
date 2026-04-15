@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@android:drawable/ic_menu_info_details"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Privacidade e Dados"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="O EcoTrack valoriza sua privacidade. Os dados de consumo de água e energia são armazenados exclusivamente de forma LOCAL no seu dispositivo. Nenhum dado é enviado para servidores externos."
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:layout_marginBottom="30dp"/>
+
+    <Button
+        android:id="@+id/btnAceitar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Eu aceito e entendo os termos"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"/>
+
+</LinearLayout>
