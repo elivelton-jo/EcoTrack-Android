@@ -5,101 +5,71 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.example.ecotrack.model.Agua;
-import com.example.ecotrack.model.Energia;
-import com.example.ecotrack.model.Recurso;
+import com.example.ecotrack.model.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class
-DbHelper extends SQLiteOpenHelper {
-
+public class DbHelper extends SQLiteOpenHelper {
     // Configurações do Banco de Dados
-    private static final String DATABASE_NAME = "ecotrack.db";
-    private static final int DATABASE_VERSION = 1;
-
-    // Nome da Tabela e Colunas
-    private static final String TABLE_RECURSOS = "recursos";
-    private static final String COL_ID = "id";
-    private static final String COL_NOME = "nome";
-    private static final String COL_DATA = "data";
-    private static final String COL_TIPO = "tipo"; // "agua" ou "energia"
-    private static final String COL_VALOR = "valor";
+    private static final String NOME_BANCO = "ecotrack.db";
+    private static final int VERSAO = 1;
 
     public DbHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, NOME_BANCO, null, VERSAO);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Criando a tabela (SQL)
-        String createTable = "CREATE TABLE " + TABLE_RECURSOS + " (" +
-                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_NOME + " TEXT, " +
-                COL_DATA + " TEXT, " +
-                COL_TIPO + " TEXT, " +
-                COL_VALOR + " REAL)";
-        db.execSQL(createTable);
+        // Criação da tabela para armazenar os recursos cadastrados
+        db.execSQL("CREATE TABLE recursos (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, data TEXT, valor REAL, tipo TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURSOS);
-        onCreate(db);
+        // Lógica para atualização de versão do banco, se necessário
     }
 
-    // --- OPERAÇÕES CRUD ---
-
-    // 1. CREATE (Salvar)
-    public boolean salvarRecurso(String nome, String data, String tipo, double valor) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_NOME, nome);
-        values.put(COL_DATA, data);
-        values.put(COL_TIPO, tipo);
-        values.put(COL_VALOR, valor);
-
-        long result = db.insert(TABLE_RECURSOS, null, values);
-        return result != -1; // Retorna true se salvou corretamente
+    // Método para salvar um recurso (Água ou Energia) no banco
+    public void inserir(Recurso r) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("nome", r.getNome());
+        cv.put("data", r.getData());
+        cv.put("valor", r.getValor());
+        // Identifica o tipo do objeto para salvar no banco (Polimorfismo)
+        cv.put("tipo", r instanceof Agua ? "AGUA" : "ENERGIA");
+        db.insert("recursos", null, cv);
     }
 
-    // 2. READ (Listar todos)
+    // Método para recuperar todos os registros do banco e transformar em objetos Java
     public List<Recurso> listarTodos() {
         List<Recurso> lista = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_RECURSOS, null);
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM recursos", null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                String tipo = cursor.getString(3);
-                Recurso recurso;
+        while (cursor.moveToNext()) {
+            String tipo = cursor.getString(4);
+            Recurso r;
+            // Instanciação dinâmica baseada no tipo salvo (Fábrica de objetos)
+            if (tipo.equals("AGUA")) {
+                r = new Agua(cursor.getString(1), cursor.getString(2), cursor.getDouble(3));
+            } else {
+                r = new Energia(cursor.getString(1), cursor.getString(2), cursor.getDouble(3));
+            }
+            r.setId(cursor.getInt(0));
+            lista.add(r);
 
-                // Aqui aplicamos a lógica para decidir qual classe filha criar
-                if (tipo.equals("agua")) {
-                    Agua a = new Agua();
-                    a.setMetrosCubicos(cursor.getDouble(4));
-                    recurso = a;
-                } else {
-                    Energia e = new Energia();
-                    e.setKwh(cursor.getDouble(4));
-                    recurso = e;
-                }
-
-                recurso.setId(cursor.getInt(0));
-                recurso.setNome(cursor.getString(1));
-                recurso.setData(cursor.getString(2));
-                lista.add(recurso);
-            } while (cursor.moveToNext());
         }
         cursor.close();
         return lista;
     }
-
-    // 3. DELETE (Excluir)
-    public void deletarRecurso(int id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        // O delete recebe: nome da tabela, cláusula WHERE e o valor do parâmetro
+    /**
+     * Método para deletar um registro do banco de dados.
+     * @param id O identificador único do recurso que será removido.
+     */
+    public void deletar(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        // O comando delete pede: (nome da tabela, cláusula WHERE, argumentos do WHERE)
         db.delete("recursos", "id = ?", new String[]{String.valueOf(id)});
-        db.close();
+        db.close(); // Boa prática: fechar a conexão após a operação
     }
 }

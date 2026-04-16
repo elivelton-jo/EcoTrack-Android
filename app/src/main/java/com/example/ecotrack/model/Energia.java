@@ -1,27 +1,18 @@
 package com.example.ecotrack.model;
 
+/**
+ * Subclasse que representa o recurso Energia.
+ * Aplica Polimorfismo ao sobrescrever o método calcularImpacto.
+ */
 public class Energia extends Recurso {
 
-    private double kwh;
-
-    public Energia() {
-        super();
+    public Energia(String nome, String data, double valor) {
+        super(nome, data, valor);
     }
 
-    // Getter e Setter para o atributo específico
-    public double getKwh() {
-        return kwh;
-    }
-
-    public void setKwh(double kwh) {
-        this.kwh = kwh;
-    }
-
-    // Polimorfismo: implementando a lógica específica para Energia
     @Override
     public String calcularImpacto() {
-        // Exemplo: Cálculo fictício de emissão de CO2 (0.5kg por kWh)
-        double co2 = this.kwh * 0.5;
-        return "Impacto: Foram gerados " + co2 + "kg de CO2 na atmosfera.";
+        // Regra de negócio: Cálculo de emissão de CO2 baseada no consumo
+        return "Redução de " + (getValor() * 0.5) + "kg de CO2.";
     }
 }

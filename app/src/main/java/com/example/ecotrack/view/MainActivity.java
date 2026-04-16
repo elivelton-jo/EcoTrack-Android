@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 List<Recurso> listaAtual = db.listarTodos();
                 Recurso recursoParaDeletar = listaAtual.get(posicao);
 
-                db.deletarRecurso(recursoParaDeletar.getId());
+                db.deletar(recursoParaDeletar.getId());
                 atualizarLista();
 
                 Toast.makeText(MainActivity.this, "Registro removido!", Toast.LENGTH_SHORT).show();

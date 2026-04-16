@@ -10,6 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.ecotrack.R;
 import com.example.ecotrack.database.DbHelper;
+import com.example.ecotrack.model.Agua;
+import com.example.ecotrack.model.Energia;
+import com.example.ecotrack.model.Recurso;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -26,22 +29,23 @@ public class CadastroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro);
 
+        // Inicializa o banco de dados
         db = new DbHelper(this);
         calendario = Calendar.getInstance();
 
-        // Inicializa os componentes
+        // Vincula os componentes do XML
         editNome = findViewById(R.id.editNome);
         editData = findViewById(R.id.editData);
         editValor = findViewById(R.id.editValor);
         spinnerTipo = findViewById(R.id.spinnerTipo);
         btnSalvar = findViewById(R.id.btnSalvar);
 
-        // Configura o Spinner
+        // Configura o Spinner (Menu de seleção)
         String[] tipos = {"Água", "Energia"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, tipos);
         spinnerTipo.setAdapter(adapter);
 
-        // --- CONFIGURAÇÃO DO SELETOR DE DATA (CALENDÁRIO) ---
+        // Configura o seletor de data (DatePicker)
         editData.setOnClickListener(v -> abrirCalendario());
 
         // Ação do botão salvar
@@ -54,41 +58,47 @@ public class CadastroActivity extends AppCompatActivity {
         int dia = calendario.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog picker = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            // Formata a data para exibir no campo (DD/MM/AAAA)
-            String dataFormatada = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, (month + 1), year);
+            // Formata a data para o padrão brasileiro DD/MM/AAAA
+            String dataFormatada = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, month + 1, year);
             editData.setText(dataFormatada);
         }, ano, mes, dia);
-
-        // Opcional: Impedir que o usuário selecione uma data no futuro
-        picker.getDatePicker().setMaxDate(System.currentTimeMillis());
 
         picker.show();
     }
 
     private void salvar() {
-        String nome = editNome.getText().toString();
-        String data = editData.getText().toString();
-        String tipo = spinnerTipo.getSelectedItem().toString();
-        String valorStr = editValor.getText().toString();
+        // 1. Coleta os dados
+        String nome = editNome.getText().toString().trim();
+        String data = editData.getText().toString().trim();
+        String valorTexto = editValor.getText().toString().trim();
 
-        // Validação simples
-        if (nome.isEmpty() || data.isEmpty() || valorStr.isEmpty()) {
+        // 2. Validação: impede que o app quebre por campos vazios
+        if (nome.isEmpty() || data.isEmpty() || valorTexto.isEmpty()) {
             Toast.makeText(this, "Por favor, preencha todos os campos!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
-            double valor = Double.parseDouble(valorStr);
-            boolean sucesso = db.salvarRecurso(nome, data, tipo, valor);
+            double valor = Double.parseDouble(valorTexto);
+            Recurso novoRecurso;
 
-            if (sucesso) {
-                Toast.makeText(this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
-                finish();
+            // 3. Polimorfismo: Decide qual objeto criar baseado no Spinner
+            if (spinnerTipo.getSelectedItemPosition() == 0) {
+                // Instancia classe Agua
+                novoRecurso = new Agua(nome, data, valor);
             } else {
-                Toast.makeText(this, "Erro ao salvar.", Toast.LENGTH_SHORT).show();
+                // Instancia classe Energia
+                novoRecurso = new Energia(nome, data, valor);
             }
+
+            // 4. Persistência: Salva no SQLite
+            db.inserir(novoRecurso);
+
+            Toast.makeText(this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
+            finish(); // Fecha a tela e volta para a principal
+
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Valor inválido!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Digite um valor numérico válido!", Toast.LENGTH_SHORT).show();
         }
     }
 }

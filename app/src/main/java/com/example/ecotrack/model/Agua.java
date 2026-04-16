@@ -1,28 +1,19 @@
 package com.example.ecotrack.model;
 
-// 'extends' indica que Agua é filha de Recurso (Herança)
+/**
+ * Subclasse que representa o recurso Água.
+ * Aplica Herança ao estender a classe Recurso.
+ */
 public class Agua extends Recurso {
 
-    private double metrosCubicos;
-
-    public Agua() {
-        super(); // Chama o construtor da classe pai
+    // Construtor que repassa os dados para a classe pai (Recurso)
+    public Agua(String nome, String data, double valor) {
+        super(nome, data, valor);
     }
 
-    // Getter e Setter para o atributo específico
-    public double getMetrosCubicos() {
-        return metrosCubicos;
-    }
-
-    public void setMetrosCubicos(double metrosCubicos) {
-        this.metrosCubicos = metrosCubicos;
-    }
-
-    // Polimorfismo: implementando a lógica específica para Água
     @Override
     public String calcularImpacto() {
-        // Exemplo: converter m3 para litros para mostrar o impacto
-        double litros = this.metrosCubicos * 1000;
-        return "Impacto: Foram consumidos " + litros + " litros de água.";
+        // Regra de negócio: Para cada unidade (ex: m3), estima-se 10 litros salvos
+        return "Economia de " + (getValor() * 10) + " litros de água.";
     }
 }
