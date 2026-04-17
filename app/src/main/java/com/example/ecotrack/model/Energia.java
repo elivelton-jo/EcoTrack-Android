@@ -1,8 +1,10 @@
 package com.example.ecotrack.model;
 
+import java.util.Locale;
+
 /**
- * Subclasse que representa o recurso Energia.
- * Aplica Polimorfismo ao sobrescrever o método calcularImpacto.
+ * Subclasse Energia.
+ * Aqui mostramos o consumo em kWh e o impacto em CO2.
  */
 public class Energia extends Recurso {
 
@@ -12,7 +14,11 @@ public class Energia extends Recurso {
 
     @Override
     public String calcularImpacto() {
-        // Regra de negócio: Cálculo de emissão de CO2 baseada no consumo
-        return "Redução de " + (getValor() * 0.5) + "kg de CO2.";
+        // Cálculo: kWh multiplicado pelo fator de emissão (ex: 0.5)
+        double co2 = getValor() * 0.5;
+
+        // Retorna uma String formatada com as duas informações
+        return String.format(Locale.getDefault(),
+                "Consumo: %.1f kWh | Impacto: %.1f kg CO2", getValor(), co2);
     }
 }

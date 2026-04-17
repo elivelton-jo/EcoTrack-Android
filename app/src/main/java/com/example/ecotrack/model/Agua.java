@@ -1,19 +1,19 @@
 package com.example.ecotrack.model;
 
-/**
- * Subclasse que representa o recurso Água.
- * Aplica Herança ao estender a classe Recurso.
- */
+import java.util.Locale;
+
 public class Agua extends Recurso {
 
-    // Construtor que repassa os dados para a classe pai (Recurso)
     public Agua(String nome, String data, double valor) {
         super(nome, data, valor);
     }
 
     @Override
     public String calcularImpacto() {
-        // Regra de negócio: Para cada unidade (ex: m3), estima-se 10 litros salvos
-        return "Economia de " + (getValor() * 10) + " litros de água.";
+        // Considerando que o valor digitado seja em m³ (metros cúbicos)
+        double litros = getValor() * 1000;
+
+        return String.format(Locale.getDefault(),
+                "Consumo: %.1f m³ | Economia: %.0f L", getValor(), litros);
     }
 }
