@@ -1,10 +1,14 @@
 package com.example.ecotrack.view;
 
 import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.ecotrack.R;
@@ -31,26 +35,44 @@ public class CadastroActivity extends AppCompatActivity {
         editValor = findViewById(R.id.editValor);
         spinnerTipo = findViewById(R.id.spinnerTipo);
 
-        // CONFIGURAÇÃO DO CALENDÁRIO
-        editData.setFocusable(false); // Impede abrir o teclado
+        // 1. CONFIGURAÇÃO DO CALENDÁRIO PROFISSIONAL
+        editData.setFocusable(false);
         editData.setOnClickListener(v -> mostrarCalendario());
 
+        // 2. CONFIGURAÇÃO DO SPINNER COM CORES CORRIGIDAS (TEXTO PRETO)
         String[] tipos = {"Energia", "Água"};
-        spinnerTipo.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, tipos));
 
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tipos) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                ((TextView) v).setTextColor(Color.BLACK); // Texto preto quando fechado
+                ((TextView) v).setTextSize(16);
+                return v;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View v = super.getDropDownView(position, convertView, parent);
+                ((TextView) v).setTextColor(Color.BLACK); // Texto preto na lista aberta
+                ((TextView) v).setPadding(30, 30, 30, 30); // Mais espaçoso
+                return v;
+            }
+        };
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTipo.setAdapter(adapter);
+
+        // 3. BOTÃO SALVAR
         findViewById(R.id.btnSalvar).setOnClickListener(v -> salvar());
     }
 
     private void mostrarCalendario() {
         Calendar c = Calendar.getInstance();
-        int ano = c.get(Calendar.YEAR);
-        int mes = c.get(Calendar.MONTH);
-        int dia = c.get(Calendar.DAY_OF_MONTH);
-
         DatePickerDialog dpd = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             String dataFormatada = String.format("%02d/%02d/%d", dayOfMonth, (month + 1), year);
             editData.setText(dataFormatada);
-        }, ano, mes, dia);
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
         dpd.show();
     }
 
@@ -60,17 +82,30 @@ public class CadastroActivity extends AppCompatActivity {
         String valorStr = editValor.getText().toString();
         String tipo = spinnerTipo.getSelectedItem().toString();
 
+        // 4. MENSAGEM PERSONALIZADA (Erro corrigido)
         if (nome.isEmpty() || data.isEmpty() || valorStr.isEmpty()) {
-            Toast.makeText(this, "Preencha tudo!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Preencha todos os campos, por favor!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double valor = Double.parseDouble(valorStr);
-        Recurso novo = tipo.equals("Energia") ? new Energia(nome, data, valor) : new Agua(nome, data, valor);
+        try {
+            double valor = Double.parseDouble(valorStr);
+            Recurso novoRecurso;
 
-        if (db.inserir(novo) != -1) {
-            Toast.makeText(this, "Salvo!", Toast.LENGTH_SHORT).show();
-            finish();
+            if (tipo.equals("Energia")) {
+                novoRecurso = new Energia(nome, data, valor);
+            } else {
+                novoRecurso = new Agua(nome, data, valor);
+            }
+
+            if (db.inserir(novoRecurso) != -1) {
+                Toast.makeText(this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Erro ao salvar no banco!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Insira um valor numérico válido!", Toast.LENGTH_SHORT).show();
         }
     }
 }
