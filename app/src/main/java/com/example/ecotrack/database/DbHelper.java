@@ -56,24 +56,25 @@ public class DbHelper extends SQLiteOpenHelper {
     public List<Recurso> listarTodos() {
         List<Recurso> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM recursos", null);
+        // Garantimos que estamos pegando as colunas certas
+        Cursor cursor = db.rawQuery("SELECT id, nome, data, valor, tipo FROM recursos", null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(0);
                 String nome = cursor.getString(1);
                 String data = cursor.getString(2);
                 double valor = cursor.getDouble(3);
                 String tipo = cursor.getString(4);
 
-                if ("Energia".equals(tipo)) {
+                // Criamos o objeto específico baseado no tipo salvo
+                if ("Energia".equalsIgnoreCase(tipo)) {
                     lista.add(new Energia(nome, data, valor));
                 } else {
                     lista.add(new Agua(nome, data, valor));
                 }
             } while (cursor.moveToNext());
+            cursor.close();
         }
-        cursor.close();
         return lista;
     }
 }

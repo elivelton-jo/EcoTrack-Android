@@ -1,5 +1,6 @@
 package com.example.ecotrack.view;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -11,6 +12,7 @@ import com.example.ecotrack.database.DbHelper;
 import com.example.ecotrack.model.Agua;
 import com.example.ecotrack.model.Energia;
 import com.example.ecotrack.model.Recurso;
+import java.util.Calendar;
 
 public class CadastroActivity extends AppCompatActivity {
 
@@ -24,20 +26,32 @@ public class CadastroActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cadastro);
 
         db = new DbHelper(this);
-
-        // Inicializa os componentes do XML
         editNome = findViewById(R.id.editNome);
         editData = findViewById(R.id.editData);
         editValor = findViewById(R.id.editValor);
         spinnerTipo = findViewById(R.id.spinnerTipo);
 
-        // Configura as opções do Spinner
-        String[] tipos = {"Energia", "Água"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, tipos);
-        spinnerTipo.setAdapter(adapter);
+        // CONFIGURAÇÃO DO CALENDÁRIO
+        editData.setFocusable(false); // Impede abrir o teclado
+        editData.setOnClickListener(v -> mostrarCalendario());
 
-        // Botão Salvar
+        String[] tipos = {"Energia", "Água"};
+        spinnerTipo.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, tipos));
+
         findViewById(R.id.btnSalvar).setOnClickListener(v -> salvar());
+    }
+
+    private void mostrarCalendario() {
+        Calendar c = Calendar.getInstance();
+        int ano = c.get(Calendar.YEAR);
+        int mes = c.get(Calendar.MONTH);
+        int dia = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dpd = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            String dataFormatada = String.format("%02d/%02d/%d", dayOfMonth, (month + 1), year);
+            editData.setText(dataFormatada);
+        }, ano, mes, dia);
+        dpd.show();
     }
 
     private void salvar() {
@@ -46,30 +60,17 @@ public class CadastroActivity extends AppCompatActivity {
         String valorStr = editValor.getText().toString();
         String tipo = spinnerTipo.getSelectedItem().toString();
 
-        // Validação simples
         if (nome.isEmpty() || data.isEmpty() || valorStr.isEmpty()) {
-            Toast.makeText(this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Preencha tudo!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         double valor = Double.parseDouble(valorStr);
-        Recurso novoRecurso;
+        Recurso novo = tipo.equals("Energia") ? new Energia(nome, data, valor) : new Agua(nome, data, valor);
 
-        // Verifica o tipo selecionado para criar o objeto correto
-        if (tipo.equals("Energia")) {
-            novoRecurso = new Energia(nome, data, valor);
-        } else {
-            novoRecurso = new Agua(nome, data, valor);
-        }
-
-        // Tenta salvar no banco de dados
-        long id = db.inserir(novoRecurso);
-
-        if (id != -1) {
-            Toast.makeText(this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
-            finish(); // Fecha a tela e volta para a MainActivity
-        } else {
-            Toast.makeText(this, "Erro ao salvar no banco!", Toast.LENGTH_SHORT).show();
+        if (db.inserir(novo) != -1) {
+            Toast.makeText(this, "Salvo!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 }
