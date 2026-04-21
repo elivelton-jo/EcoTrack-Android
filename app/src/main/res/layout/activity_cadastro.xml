@@ -64,7 +64,8 @@
         android:layout_height="55dp"
         android:layout_marginBottom="32dp"
         android:background="@drawable/edit_text_border"
-        android:padding="12dp"/>
+        android:spinnerMode="dropdown"
+        android:padding="12dp" />
 
     <Button
         android:id="@+id/btnSalvar"

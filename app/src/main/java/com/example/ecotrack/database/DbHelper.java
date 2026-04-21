@@ -52,7 +52,18 @@ public class DbHelper extends SQLiteOpenHelper {
 
         return db.insert("recursos", null, values);
     }
-
+    // Adicione isso dentro da classe DbHelper
+    public void deletar(String nomeDoRegistro) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Remove a linha onde a coluna 'nome' é igual ao que passamos
+            db.delete("recursos", "nome = ?", new String[]{nomeDoRegistro});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+    }
     public List<Recurso> listarTodos() {
         List<Recurso> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
