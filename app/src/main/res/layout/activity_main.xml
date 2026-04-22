@@ -42,13 +42,14 @@
 
             <TextView
                 android:id="@+id/txtResumoImpacto"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Calculando..."
-                android:textColor="@color/branco"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginTop="4dp"/>
+                android:background="#FFFFFF"
+                android:elevation="4dp"
+                android:padding="24dp"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:textColor="#1B5E20" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

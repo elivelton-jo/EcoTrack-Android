@@ -42,20 +42,26 @@ public class CadastroActivity extends AppCompatActivity {
         // 2. CONFIGURAÇÃO DO SPINNER COM CORES CORRIGIDAS (TEXTO PRETO)
         String[] tipos = {"Energia", "Água"};
 
+        // Dentro do onCreate da CadastroActivity, localize o Spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tipos) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View v = super.getView(position, convertView, parent);
-                ((TextView) v).setTextColor(Color.BLACK); // Texto preto quando fechado
-                ((TextView) v).setTextSize(16);
+                TextView tv = (TextView) v;
+                tv.setTextColor(Color.BLACK); // Texto sempre preto
+                tv.setTextSize(16);
+                // Remove qualquer fundo escuro que o Android tente colocar
+                v.setBackgroundColor(Color.WHITE);
                 return v;
             }
 
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View v = super.getDropDownView(position, convertView, parent);
-                ((TextView) v).setTextColor(Color.BLACK); // Texto preto na lista aberta
-                ((TextView) v).setPadding(30, 30, 30, 30); // Mais espaçoso
+                TextView tv = (TextView) v;
+                tv.setTextColor(Color.BLACK); // Texto da lista também preto
+                tv.setBackgroundColor(Color.WHITE); // Fundo da lista branco
+                tv.setPadding(30, 30, 30, 30);
                 return v;
             }
         };

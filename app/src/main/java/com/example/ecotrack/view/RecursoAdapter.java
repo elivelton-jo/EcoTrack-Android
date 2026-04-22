@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ecotrack.R;
 import com.example.ecotrack.model.Recurso;
 import java.util.List;
+import android.graphics.Typeface;
+import com.example.ecotrack.model.Energia;
 
 public class RecursoAdapter extends RecyclerView.Adapter<RecursoAdapter.ViewHolder> {
 
@@ -36,12 +38,16 @@ public class RecursoAdapter extends RecyclerView.Adapter<RecursoAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Recurso r = lista.get(position);
 
-        // CORRIGINDO O ERRO DE CORES (Texto Preto para visibilidade)
-        holder.text1.setText(r.getNome() + " (" + r.getData() + ")");
-        holder.text1.setTextColor(Color.BLACK);
+        // No onBindViewHolder do RecursoAdapter
+        holder.text1.setText(r.getNome().toUpperCase()); // Nome em Caps para parecer rótulo
+        holder.text1.setTextSize(16);
+        holder.text1.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        holder.text1.setTextColor(Color.parseColor("#212121")); // Preto quase total
 
-        holder.text2.setText("Valor: " + r.getValor() + " | Impacto: " + r.calcularImpacto());
-        holder.text2.setTextColor(Color.DKGRAY);
+        holder.text2.setText("📅 " + r.getData() + "  |  ⚡ " + r.getValor() + (r instanceof Energia ? " kWh" : " L"));
+        holder.text2.setTextSize(13);
+        holder.text2.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        holder.text2.setTextColor(Color.parseColor("#757575")); // Cinza elegante
 
         // Lógica de clique longo para apagar
         holder.itemView.setOnLongClickListener(v -> {

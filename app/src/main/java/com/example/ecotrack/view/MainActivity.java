@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
                 if (r instanceof Energia) {
                     totalKwh += r.getValor();
                 } else if (r instanceof Agua) {
-                    // Converte para litros para o dashboard
-                    totalLitros += (r.getValor() * 1000);
+                    //Soma o valor direto como o usuário digitou (Litros)
+                    totalLitros += r.getValor();
                 }
             }
         }
@@ -77,11 +77,12 @@ public class MainActivity extends AppCompatActivity {
         String resumo = String.format(Locale.getDefault(),
                 "CONSUMO TOTAL\n%.1f kWh  |  %.0f Litros", totalKwh, totalLitros);
 
+        // Dentro do atualizarLista na MainActivity
         txtResumo.setText(resumo);
-        txtResumo.setTextSize(22); // Fonte maior
-        txtResumo.setTypeface(null, Typeface.BOLD); // Negrito
-        txtResumo.setTextColor(Color.parseColor("#2E7D32")); // Verde escuro profissional
-        txtResumo.setLineSpacing(0, 1.2f); // Espaçamento entre linhas
+        txtResumo.setTextSize(24); // Um pouco maior para destaque
+        txtResumo.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD)); // Fonte moderna
+        txtResumo.setTextColor(Color.parseColor("#1B5E20")); // Um verde mais profundo/elegante
+        txtResumo.setLetterSpacing(0.05f); // Espaçamento entre letras (toque de design)
 
         // CONFIGURAÇÃO DO ADAPTER COM EXCLUSÃO
         RecursoAdapter adapter = new RecursoAdapter(lista, recurso -> {
