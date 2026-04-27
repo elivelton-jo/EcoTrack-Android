@@ -61,7 +61,7 @@ public class DbHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            db.close();
+
         }
     }
     public List<Recurso> listarTodos() {
@@ -88,4 +88,29 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         return lista;
     }
+    public String gerarResumo() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double totalKwh = 0;
+        double totalLitros = 0;
+
+        Cursor cursor = db.rawQuery("SELECT valor, tipo FROM recursos", null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                double valor = cursor.getDouble(0);
+                String tipo = cursor.getString(1);
+
+                if ("Energia".equalsIgnoreCase(tipo)) {
+                    totalKwh += valor;
+                } else if ("Água".equalsIgnoreCase(tipo)) {
+                    totalLitros += valor;
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        // Retorna o texto formatado para o seu TextView branco
+        return String.format("CONSUMO TOTAL\n%.1f kWh | %.1f Litros", totalKwh, totalLitros);
+    }
+
 }

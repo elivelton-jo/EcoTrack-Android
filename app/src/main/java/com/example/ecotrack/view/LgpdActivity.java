@@ -17,6 +17,8 @@ public class LgpdActivity extends AppCompatActivity {
         Button btnAceitar = findViewById(R.id.btnAceitar);
 
         btnAceitar.setOnClickListener(v -> {
+            SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            preferences.edit().putBoolean("aceitou_termos", true).apply();
             // Salva a preferência no "disco" do celular
             SharedPreferences pref = getSharedPreferences("EcoTrackPrefs", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
